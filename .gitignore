@@ -1,0 +1,6 @@
+.env
+__pycache__/
+*.pyc
+vehicle_service.db
+.vscode/
+node_modules/

@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome | Autocare Hub </title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #030712;
+            color: var(--text-primary);
+            overflow-x: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Ambient Car Themed Background */
+        .car-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(6, 182, 212, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.08) 0%, transparent 60%),
+                #030712;
+            overflow: hidden;
+        }
+
+        .car-bg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url('https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=2070');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.18;
+            filter: grayscale(40%) contrast(120%) blur(2px);
+            mix-blend-mode: overlay;
+        }
+
+        /* Carbon fiber pattern overlay */
+        .carbon-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            background-image: linear-gradient(45deg, rgba(0, 0, 0, 0.1) 25%, transparent 25%),
+                linear-gradient(-45deg, rgba(0, 0, 0, 0.1) 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, rgba(0, 0, 0, 0.1) 75%),
+                linear-gradient(-45deg, transparent 75%, rgba(0, 0, 0, 0.1) 75%);
+            background-size: 4px 4px;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        /* Cyberpunk Neon Lines */
+        .neon-trail {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            height: 1px;
+            width: 150px;
+            opacity: 0.4;
+            animation: travel 8s infinite linear;
+        }
+
+        .neon-trail-1 {
+            top: 15%;
+            left: -150px;
+            animation-delay: 0s;
+        }
+
+        .neon-trail-2 {
+            top: 65%;
+            left: -150px;
+            animation-delay: 3s;
+            background: linear-gradient(90deg, transparent, var(--secondary), transparent);
+        }
+
+        .neon-trail-3 {
+            top: 85%;
+            left: -150px;
+            animation-delay: 5s;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+
+        @keyframes travel {
+            0% {
+                left: -150px;
+            }
+
+            100% {
+                left: 100%;
+            }
+        }
+
+        /* Main Container */
+        .welcome-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 1200px;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        /* Header Animation */
+        .brand-header {
+            margin-bottom: 3.5rem;
+            animation: fadeInDown 0.8s var(--ease-spring);
+        }
+
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: rgba(99, 102, 241, 0.12);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--primary-light);
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.1);
+        }
+
+        .brand-badge i {
+            animation: spinFast 4s linear infinite;
+        }
+
+        @keyframes spinFast {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .welcome-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            letter-spacing: -2px;
+            color: var(--text-primary);
+            text-shadow: 0 0 50px rgba(99, 102, 241, 0.2);
+        }
+
+        .welcome-subtitle {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            color: var(--text-secondary);
+            max-width: 650px;
+            margin: 1.25rem auto 0;
+            font-weight: 500;
+        }
+
+        /* Developers Cards Grid */
+        .dev-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+            perspective: 1000px;
+        }
+
+        .dev-card {
+            background: rgba(13, 21, 38, 0.65);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 30px;
+            padding: 3rem 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            animation: scaleIn 0.8s var(--ease-spring) both;
+        }
+
+        .dev-card:nth-child(1) {
+            animation-delay: 0.15s;
+            --glow-color: var(--primary);
+        }
+
+        .dev-card:nth-child(2) {
+            animation-delay: 0.3s;
+            --glow-color: var(--secondary);
+        }
+
+        .dev-card:nth-child(3) {
+            animation-delay: 0.45s;
+            --glow-color: var(--accent);
+        }
+
+        .dev-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% -20%, rgba(255, 255, 255, 0.12) 0%, transparent 60%);
+            pointer-events: none;
+            transition: opacity 0.5s;
+        }
+
+        /* Hover states with extreme neon glows */
+        .dev-card:hover {
+            transform: translateY(-12px) rotateX(4deg) rotateY(-4deg);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow:
+                0 30px 60px rgba(0, 0, 0, 0.5),
+                0 0 40px var(--glow-color)80;
+            /* Glow transparency */
+            background: rgba(13, 21, 38, 0.8);
+        }
+
+        /* Custom dashboard gauge-style icon container */
+        .dev-icon-wrapper {
+            width: 80px;
+            height: 80px;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin: 0 auto 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: all 0.5s;
+            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.05);
+        }
+
+        .dev-card:hover .dev-icon-wrapper {
+            background: var(--glow-color);
+            color: #ffffff;
+            transform: scale(1.1) rotate(10deg);
+            box-shadow:
+                0 0 25px var(--glow-color),
+                inset 0 2px 4px rgba(255, 255, 255, 0.3);
+        }
+
+        .dev-icon-wrapper i {
+            width: 32px;
+            height: 32px;
+            color: var(--glow-color);
+            transition: color 0.5s;
+        }
+
+        .dev-card:hover .dev-icon-wrapper i {
+            color: #ffffff;
+        }
+
+        /* Dev Info */
+        .dev-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        .dev-reg {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--glow-color);
+            letter-spacing: 2px;
+            margin-bottom: 1.5rem;
+            font-family: 'Space Grotesk', sans-serif;
+            opacity: 0.9;
+        }
+
+        .dev-divider {
+            height: 1px;
+            width: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 0 auto 1.5rem;
+            transition: width 0.3s;
+        }
+
+        .dev-card:hover .dev-divider {
+            width: 120px;
+            background: var(--glow-color);
+        }
+
+        .dev-role {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            line-height: 1.5;
+        }
+
+        /* Futuristic speedometer style tags */
+        .gauge-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 0.4rem 1rem;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-top: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .dev-card:hover .gauge-tag {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
+            color: var(--text-primary);
+        }
+
+        .gauge-tag::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--glow-color);
+            box-shadow: 0 0 8px var(--glow-color);
+        }
+
+        /* CTA Button - Enter Portal */
+        .enter-portal-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border: none;
+            padding: 1.25rem 3.5rem;
+            border-radius: var(--radius-full);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #ffffff;
+            text-decoration: none;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3), 0 0 50px rgba(6, 182, 212, 0.2);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: pulseBtn 3s infinite;
+        }
+
+        .enter-portal-btn:hover {
+            transform: scale(1.05) translateY(-3px);
+            box-shadow:
+                0 15px 40px rgba(99, 102, 241, 0.5),
+                0 0 60px rgba(6, 182, 212, 0.4),
+                inset 0 0 15px rgba(255, 255, 255, 0.3);
+            letter-spacing: 2px;
+        }
+
+        .enter-portal-btn:active {
+            transform: scale(0.98) translateY(-1px);
+        }
+
+        .enter-portal-btn i {
+            transition: transform 0.5s;
+        }
+
+        .enter-portal-btn:hover i {
+            transform: translateX(6px) scale(1.1);
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes pulseBtn {
+
+            0%,
+            100% {
+                box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3), 0 0 40px rgba(6, 182, 212, 0.15);
+            }
+
+            50% {
+                box-shadow: 0 15px 45px rgba(99, 102, 241, 0.5), 0 0 70px rgba(6, 182, 212, 0.35);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="car-bg">
+        <div class="carbon-overlay"></div>
+        <div class="neon-trail neon-trail-1"></div>
+        <div class="neon-trail neon-trail-2"></div>
+        <div class="neon-trail neon-trail-3"></div>
+    </div>
+
+    <div class="welcome-container">
+        <header class="brand-header">
+            <h1 class="welcome-title">Autocare <span class="text-gradient">Hub</span></h1>
+        </header>
+
+        <main class="dev-grid">
+            <!-- Developer 1 -->
+            <article class="dev-card">
+                <h2 class="dev-name" style="margin-bottom: 1rem;">DHARSHAN S</h2>
+                <div class="dev-reg">927624BIT025</div>
+            </article>
+
+            <!-- Developer 2 -->
+            <article class="dev-card">
+                <h2 class="dev-name" style="margin-bottom: 1rem;">KISHORE G</h2>
+                <div class="dev-reg">927624BIT048</div>
+            </article>
+
+            <!-- Developer 3 -->
+            <article class="dev-card">
+                <h2 class="dev-name" style="margin-bottom: 1rem;">KISHORE P</h2>
+                <div class="dev-reg">927624BIT050</div>
+            </article>
+        </main>
+
+        <footer>
+            <a href="/home" class="enter-portal-btn">
+                <span>Start Your Service</span>
+                <i data-lucide="arrow-right"></i>
+            </a>
+        </footer>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

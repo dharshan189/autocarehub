@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Checkout | NextGen AutoCare</title>
+    <link rel="stylesheet" href="static/css/index.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            background: var(--bg-body);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
+        .checkout-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            max-width: 1000px;
+            width: 90%;
+        }
+
+        .order-summary {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            padding: 2.5rem;
+            height: fit-content;
+        }
+
+        .checkout-form {
+            padding: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .product-preview {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            font-size: 0.95rem;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        @media (max-width: 850px) {
+            .checkout-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="checkout-container">
+        <!-- Order Summary -->
+        <div class="order-summary glass animate">
+            <h2 style="margin-bottom: 2rem;">Order Summary</h2>
+            <div class="product-preview">
+                <div style="width: 80px; height: 80px; border-radius: 15px; overflow: hidden; background: #000;" id="part-img-container">
+                    <!-- Dynamic -->
+                </div>
+                <div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 0.3rem;" id="part-title">Loading part...</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;" id="part-brand"></p>
+                </div>
+            </div>
+
+            <div class="price-row">
+                <span style="color: var(--text-muted);">Item Price</span>
+                <span id="display-price">₹0.00</span>
+            </div>
+            <div class="price-row">
+                <span style="color: var(--text-muted);">Quantity</span>
+                <span id="display-qty">1</span>
+            </div>
+            <div class="price-row">
+                <span style="color: var(--text-muted);">Shipping</span>
+                <span style="color: var(--accent);">Free</span>
+            </div>
+            <div class="total-row">
+                <span>Total Amount</span>
+                <span id="display-total">₹0.00</span>
+            </div>
+            <div
+                style="margin-top: 2rem; background: rgba(99, 102, 241, 0.1); padding: 1rem; border-radius: 12px; display: flex; gap: 1rem; align-items: flex-start;">
+                <i data-lucide="shield-check" style="color: var(--primary); width: 20px; flex-shrink: 0;"></i>
+                <p style="font-size: 0.8rem; line-height: 1.5; color: var(--text-muted);">
+                    All parts are authentic OEM certified. Detailed invoice will be sent via SMS/Email after purchase.
+                </p>
+            </div>
+        </div>
+
+        <!-- Checkout Form -->
+        <div class="checkout-form animate" style="animation-delay: 0.2s;">
+            <div style="margin-bottom: 2rem;">
+                <a href="shop.html"
+                    style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                    <i data-lucide="arrow-left" style="width: 16px;"></i> Back to Store
+                </a>
+                <h1>Guest Checkout</h1>
+                <p style="color: var(--text-muted);">No login required. Complete your purchase in seconds.</p>
+            </div>
+
+            <form id="checkout-main-form" onsubmit="handleCheckout(event)">
+                <div class="form-group">
+                    <label>Quantity</label>
+                    <select id="qty-select" class="form-control" onchange="updateTotal()">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="cust-name" class="form-control" placeholder="John Doe" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number (for Order Updates)</label>
+                    <input type="tel" id="cust-phone" class="form-control" placeholder="9876543210" required pattern="[6789][0-9]{9}">
+                </div>
+
+                <div class="form-group">
+                    <label>Delivery Address</label>
+                    <textarea id="cust-address" class="form-control" rows="3" placeholder="Flat No, Street, City, Pincode" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Payment Method</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <label
+                            style="cursor: pointer; border: 1px solid var(--border); border-radius: 12px; padding: 1rem; display: flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.02);">
+                            <input type="radio" name="payment_method" value="UPI/Online" checked>
+                            <span>UPI / Card</span>
+                        </label>
+                        <label
+                            style="cursor: pointer; border: 1px solid var(--border); border-radius: 12px; padding: 1rem; display: flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.02);">
+                            <input type="radio" name="payment_method" value="COD">
+                            <span>Cash on Delivery</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-full" style="padding: 1.2rem; font-size: 1.1rem; margin-top: 1rem;">
+                    Confirm Order
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="static/js/db.js"></script>
+    <script>
+        lucide.createIcons();
+        
+        let selectedPart = null;
+
+        // Parse Query Parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const partId = parseInt(urlParams.get('id'));
+
+        if (!partId) {
+            window.location.href = 'shop.html';
+        } else {
+            selectedPart = db.getInventory().find(p => p.id === partId);
+            if (!selectedPart) {
+                alert("Selected part not found in inventory!");
+                window.location.href = 'shop.html';
+            }
+        }
+
+        // Fill Form if customer is logged in
+        const user = db.getCurrentUser();
+        if (user && user.role === 'customer') {
+            document.getElementById('cust-name').value = user.name || '';
+            document.getElementById('cust-phone').value = user.phone || '';
+        }
+
+        // Populate details
+        if (selectedPart) {
+            document.getElementById('part-title').innerText = selectedPart.name;
+            document.getElementById('part-brand').innerText = selectedPart.brand || 'Universal';
+            document.getElementById('display-price').innerText = '₹' + selectedPart.price.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+            
+            const imgContainer = document.getElementById('part-img-container');
+            if (selectedPart.image_url) {
+                imgContainer.innerHTML = `<img src="${selectedPart.image_url}" style="width:100%; height:100%; object-fit:cover;">`;
+            } else {
+                imgContainer.innerHTML = `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;"><i data-lucide="package" style="color:#666"></i></div>`;
+                lucide.createIcons();
+            }
+
+            updateTotal();
+        }
+
+        function updateTotal() {
+            if (!selectedPart) return;
+            const qty = parseInt(document.getElementById('qty-select').value);
+            const total = qty * selectedPart.price;
+
+            document.getElementById('display-qty').innerText = qty;
+            document.getElementById('display-total').innerText = '₹' + total.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+        }
+
+        function handleCheckout(event) {
+            event.preventDefault();
+            if (!selectedPart) return;
+
+            const qty = parseInt(document.getElementById('qty-select').value);
+            const name = document.getElementById('cust-name').value;
+            const phone = document.getElementById('cust-phone').value;
+            const address = document.getElementById('cust-address').value;
+            const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+            const total = qty * selectedPart.price;
+
+            if (selectedPart.stock < qty) {
+                alert(`Insufficient stock! Only ${selectedPart.stock} items left.`);
+                return;
+            }
+
+            if (paymentMethod === 'UPI/Online') {
+                // Redirect to payment gateway with params
+                const params = new URLSearchParams({
+                    amount: total,
+                    name: name,
+                    phone: phone,
+                    address: address,
+                    qty: qty,
+                    part_id: selectedPart.id
+                });
+                window.location.href = 'payment_gateway.html?' + params.toString();
+            } else {
+                // COD direct order placement
+                const orders = db.getOrders();
+                const newOrderId = orders.length > 0 ? Math.max(...orders.map(o => o.id)) + 1 : 1;
+                
+                const newOrder = {
+                    id: newOrderId,
+                    customer_name: name,
+                    phone: phone,
+                    location: address,
+                    part_id: selectedPart.id,
+                    quantity: qty,
+                    total_amount: total,
+                    payment_method: 'COD',
+                    date: new Date().toISOString(),
+                    status: 'Pending'
+                };
+
+                orders.push(newOrder);
+                db.saveOrders(orders);
+
+                // Decrement inventory stock
+                const inventory = db.getInventory();
+                const dbPart = inventory.find(p => p.id === selectedPart.id);
+                if (dbPart) {
+                    dbPart.stock -= qty;
+                    db.saveInventory(inventory);
+                }
+
+                // Redirect to success
+                window.location.href = `order_success.html?id=${newOrderId}`;
+            }
+        }
+    </script>
+    <script src="static/js/theme.js"></script>
+</body>
+
+</html>

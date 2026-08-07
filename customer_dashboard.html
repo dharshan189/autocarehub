@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Dashboard | NextGen AutoCare</title>
+    <link rel="stylesheet" href="static/css/index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-body);
+        }
+
+        .sidebar {
+            background: var(--bg-surface);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border);
+        }
+
+        .card {
+            border-radius: 24px;
+            padding: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+        }
+
+        .badge {
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .modal {
+            background: var(--bg-surface);
+            padding: 3rem;
+            width: 100%;
+            max-width: 500px;
+            border-radius: 32px;
+            position: relative;
+            box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--border);
+            animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes modalPop {
+            0% {
+                opacity: 0;
+                transform: scale(0.8) translateY(20px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .reminder-glow {
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.1);
+        }
+
+        .reminder-glow.overdue {
+            border-left-color: var(--danger);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.1);
+        }
+
+        .text-gradient {
+            background: var(--grad-primary);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        .vehicle-image-card {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-social-link {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .action-social-link:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.08);
+            transform: translateY(-2px);
+        }
+
+        /* Printable documents inside dashboard */
+        .printable-content {
+            background: #fff;
+            color: #000;
+            padding: 3rem;
+            border-radius: 12px;
+            font-family: 'Courier New', Courier, monospace;
+            max-width: 600px;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+        }
+        .printable-content h2, .printable-content h3 {
+            color: #000;
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+
+<body class="dashboard-grid">
+    <!-- ── SIDEBAR ── -->
+    <aside class="sidebar animate">
+        <div style="padding: 0 1.5rem; margin-bottom: 4rem;">
+            <a href="index.html" class="logo" style="font-size: 1.2rem;">
+                <img src="static/images/logo.png" alt="NextGen" class="logo-img" style="height: 55px;" onerror="this.src='https://images.unsplash.com/photo-1618843479313-4b88afaa5e6c?q=80&w=100'">
+                <span style="color:var(--text-primary); font-weight: 800;">NextGen</span>
+            </a>
+        </div>
+        <nav style="position: static; padding: 0; display: block; background: transparent;">
+            <ul style="list-style: none; padding: 0;">
+                <li style="margin-bottom: 0.5rem;"><a href="#" class="tab active" id="tab-overview" onclick="showSection('overview')"><i data-lucide="layout-grid"></i> Overview</a></li>
+                <li style="margin-bottom: 0.5rem;"><a href="#" class="tab" id="tab-history" onclick="showSection('history')"><i data-lucide="clipboard-list"></i> Care History</a></li>
+                <li style="margin-bottom: 0.5rem;"><a href="#" class="tab" id="tab-health" onclick="showSection('health')"><i data-lucide="activity"></i> Vehicle Health</a></li>
+                <li style="margin-bottom: 0.5rem;"><a href="#" class="tab" id="tab-booking" onclick="showSection('booking')"><i data-lucide="calendar"></i> Book Care</a></li>
+                <li style="margin-bottom: 0.5rem;"><a href="#" class="tab" id="tab-insurance" onclick="showSection('insurance')"><i data-lucide="shield-check"></i> Insurance</a></li>
+                <li style="margin-bottom: 0.5rem;"><a href="#" class="tab" id="tab-emergency" onclick="showSection('emergency')"><i data-lucide="zap" style="color:var(--danger)"></i> Emergency</a></li>
+                <li style="margin-top: 5rem;"><a onclick="db.logout()" style="color:var(--danger); background: rgba(239, 68, 68, 0.05) !important; cursor: pointer;"><i data-lucide="log-out"></i> Logout</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- ── MAIN CONTENT ── -->
+    <main class="main-content">
+        <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 3rem;" class="animate">
+            <div>
+                <h1 style="font-size: 2rem;">Welcome back, <span class="text-gradient" id="welcome-name">Customer</span></h1>
+                <p style="color:var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">Your automotive ecosystem is up to date.</p>
+            </div>
+            <div style="display:flex; gap: 1rem;">
+                <a onclick="exportReport()" class="glass" style="padding: 0.8rem 1.5rem; border-radius: 50px; text-decoration: none; color: var(--text-primary); display: flex; align-items:center; gap: 0.5rem; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
+                    <i data-lucide="download" style="width:16px"></i> Export Report
+                </a>
+            </div>
+        </header>
+
+        <!-- ── SECTION: OVERVIEW ── -->
+        <div id="overview-section" class="section-content">
+            <!-- Dynamic Reminder -->
+            <div id="reminders-container" style="margin-bottom: 3rem;"></div>
+
+            <!-- Garage Section -->
+            <div style="margin-bottom: 3rem;">
+                <h2 style="font-size: 1.5rem; margin-bottom: 1.5rem;">My Garage</h2>
+                <div class="grid stagger" id="garage-container">
+                    <!-- Dynamic -->
+                </div>
+            </div>
+
+            <!-- Stat Grid -->
+            <div class="stat-grid stagger active">
+                <div class="stat-card">
+                    <div class="icon-box"><i data-lucide="car"></i></div>
+                    <h4>Your Garage</h4>
+                    <div class="value"><span id="stat-vehicles">0</span> <span style="font-size: 0.9rem; font-weight: 400; color:var(--text-muted)">Vehicles</span></div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon-box" style="color:var(--accent); background:rgba(16, 185, 129, 0.1);"><i data-lucide="check-circle"></i></div>
+                    <h4>Total Services</h4>
+                    <div class="value"><span id="stat-completed">0</span> <span style="font-size: 0.9rem; font-weight: 400; color:var(--text-muted)">Completed</span></div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon-box" style="color:var(--danger); background:rgba(239, 68, 68, 0.1);"><i data-lucide="activity"></i></div>
+                    <h4>Active Monitoring</h4>
+                    <div class="value"><span id="stat-in-progress">0</span> <span style="font-size: 0.9rem; font-weight: 400; color:var(--text-muted)">In Progress</span></div>
+                </div>
+            </div>
+
+            <!-- Table Section -->
+            <div style="margin-top: 4rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 2rem;">
+                    <h2 style="font-size: 1.5rem;">Recent Care Activity</h2>
+                    <a onclick="showSection('history')" style="color:var(--primary); font-size: 0.9rem; text-decoration: none; font-weight: 600; cursor: pointer;">View Full History →</a>
+                </div>
+                <div class="data-table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Vehicle</th>
+                                <th>Service Scope</th>
+                                <th>Insurance</th>
+                                <th>Technician</th>
+                                <th>Status</th>
+                                <th>ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="overview-table-body">
+                            <!-- Dynamic -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── SECTION: BOOKING ── -->
+        <div id="booking-section" class="section-content" style="display:none">
+            <h2 style="margin-bottom: 2rem;">Schedule Professional Care</h2>
+            <div class="grid" id="booking-garage-container">
+                <!-- Dynamic form fields per vehicle -->
+            </div>
+        </div>
+
+        <!-- ── SECTION: HISTORY ── -->
+        <div id="history-section" class="section-content" style="display:none">
+            <h2 style="margin-bottom: 2rem;">Complete Maintenance Log</h2>
+            <div class="data-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Vehicle</th>
+                            <th>Service Work</th>
+                            <th>Technician</th>
+                            <th>Status</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-table-body">
+                        <!-- Dynamic -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ── SECTION: VEHICLE HEALTH ── -->
+        <div id="health-section" class="section-content" style="display:none">
+            <h2 style="margin-bottom: 2rem;">🤖 AI-Powered Vehicle Health Analytics</h2>
+            <p style="color:var(--text-muted); margin-bottom: 3rem;">Smart insights based on mileage, service history, and repair frequency</p>
+            <div class="grid" id="health-container">
+                <!-- Dynamic Health Cards -->
+            </div>
+        </div>
+
+        <!-- ── SECTION: INSURANCE ── -->
+        <div id="insurance-section" class="section-content" style="display:none">
+            <h2 style="margin-bottom: 2rem;">Insurance Policy Management</h2>
+            <div class="grid" id="insurance-container">
+                <!-- Dynamic Insurance Forms -->
+            </div>
+        </div>
+
+        <!-- ── SECTION: EMERGENCY ── -->
+        <div id="emergency-section" class="section-content" style="display:none">
+            <div class="glass"
+                style="padding:4rem; border: 1px solid rgba(239, 68, 68, 0.2); background: radial-gradient(circle at top right, rgba(239, 68, 68, 0.05), transparent); border-radius: 40px; text-align: center;">
+                <div style="background: rgba(239, 68, 68, 0.1); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items:center; justify-content:center; color: var(--danger); margin: 0 auto 2rem;">
+                    <i data-lucide="zap" style="width: 40px; height: 40px;"></i>
+                </div>
+                <h2 style="color:var(--danger); font-size: 2.5rem; margin-bottom: 1rem;">Roadside Recovery Assistance</h2>
+                <p style="color:var(--text-muted); max-width: 500px; margin: 0 auto 3rem;">Immediate technical assistance dispatched to your location. Average response time: 20-30 minutes.</p>
+
+                <form onsubmit="handleEmergencySubmit(event)" style="max-width: 500px; margin: 0 auto; text-align: left;">
+                    <div class="form-group">
+                        <label>Current Location / Landmark</label>
+                        <input type="text" id="emergency-location" class="form-control" placeholder="Enter nearest landmark or GPS link" required style="width: 100%; height: 50px;">
+                    </div>
+                    <div class="form-group">
+                        <label>Briefly describe the emergency</label>
+                        <textarea id="emergency-problem" class="form-control" rows="3" placeholder="e.g., Flat tire, Engine overheating, No start..." oninput="analyzeComplaint(this, 'analyzer-emergency')" required style="width: 100%;"></textarea>
+                        <div id="analyzer-emergency" style="display:none"></div>
+                    </div>
+                    <button type="submit" class="btn-premium btn-full" style="background: var(--danger); box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3); border:none; height:50px;">Request Instant Recovery</button>
+                </form>
+
+                <div id="emergency-status-box" style="display:none; margin-top:2rem; background:rgba(16,185,129,0.1); padding:1rem; border-radius:12px; color:var(--accent); font-weight:700;">
+                    Recovery Unit Dispatched! A technician is heading to your location.
+                </div>
+            </div>
+        </div>
+
+        <!-- ── MODAL: STATEMENT / PAYMENT ── -->
+        <div id="bill-modal-overlay" class="modal-backdrop" onclick="closeBillModal(event)">
+            <div id="bill-modal" class="modal" onclick="event.stopPropagation()">
+                <div style="text-align: center; margin-bottom: 2.5rem;">
+                    <h2 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.5px;">Service Statement</h2>
+                    <p id="bill-service-id" style="color:var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem; font-family: monospace; font-weight: 600; opacity: 0.7;"></p>
+                </div>
+
+                <div style="background: var(--bg-body); padding: 2rem; border-radius: 24px; margin-bottom: 2rem;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom: 1rem; font-size: 0.95rem;">
+                        <span style="color:var(--text-muted)">Parts Total:</span>
+                        <span id="bill-parts" style="font-weight: 700; color:var(--text-primary);"></span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom: 1rem; font-size: 0.95rem;">
+                        <span style="color:var(--text-muted)">Labor Charges:</span>
+                        <span id="bill-labor" style="font-weight: 700; color:var(--text-primary);"></span>
+                    </div>
+                    <div id="wash-row" style="display:none; justify-content:space-between; margin-bottom: 1.5rem; font-size: 0.95rem;">
+                        <span style="color:var(--text-muted)">Washing Charges:</span>
+                        <span id="bill-wash" style="font-weight: 700; color:var(--text-primary);"></span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; padding-top: 1.25rem; border-top: 1px solid var(--border); font-size: 1.5rem; align-items: baseline;">
+                        <span style="font-weight: 400; color:var(--text-primary);">Grand Total:</span>
+                        <span id="bill-total" style="font-weight: 900; color: var(--accent);"></span>
+                    </div>
+                </div>
+
+                <div id="payment-options"></div>
+
+                <button onclick="closeBillModal()"
+                    style="margin-top: 2rem; background: none; border: none; color: var(--text-muted); cursor: pointer; width: 100%; text-align: center; font-weight: 600; font-size: 0.9rem; transition: 0.3s; opacity: 0.6;"
+                    onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">
+                    Close Statement
+                </button>
+            </div>
+        </div>
+
+        <!-- ── MODAL: FEEDBACK ── -->
+        <div id="feedback-modal-overlay" class="modal-backdrop" onclick="closeFeedbackModal()">
+            <div class="modal" onclick="event.stopPropagation()">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div style="background: rgba(16, 185, 129, 0.1); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items:center; justify-content:center; color: var(--accent); margin: 0 auto 1.5rem;">
+                        <i data-lucide="star" style="width: 30px; height: 30px;"></i>
+                    </div>
+                    <h2 style="font-size: 1.5rem;">Rate Your Technician</h2>
+                    <p id="feedback-tech-name" style="color:var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;"></p>
+                </div>
+
+                <form onsubmit="handleFeedbackSubmit(event)">
+                    <input type="hidden" id="feedback-service-id">
+
+                    <div style="text-align: center; margin-bottom: 2rem;">
+                        <label style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Experience Rating</label>
+                        <div style="display: flex; justify-content: center; gap: 0.75rem; font-size: 2rem;">
+                            <!-- Star Radios -->
+                            <label style="cursor: pointer;">
+                                <input type="radio" name="feedback_rating" value="1" style="display: none;" required onchange="updateStars(this.value)">
+                                <i data-lucide="star" class="star-icon" id="star-1" style="color: #cbd5e1; fill: none; transition: 0.2s;"></i>
+                            </label>
+                            <label style="cursor: pointer;">
+                                <input type="radio" name="feedback_rating" value="2" style="display: none;" required onchange="updateStars(this.value)">
+                                <i data-lucide="star" class="star-icon" id="star-2" style="color: #cbd5e1; fill: none; transition: 0.2s;"></i>
+                            </label>
+                            <label style="cursor: pointer;">
+                                <input type="radio" name="feedback_rating" value="3" style="display: none;" required onchange="updateStars(this.value)">
+                                <i data-lucide="star" class="star-icon" id="star-3" style="color: #cbd5e1; fill: none; transition: 0.2s;"></i>
+                            </label>
+                            <label style="cursor: pointer;">
+                                <input type="radio" name="feedback_rating" value="4" style="display: none;" required onchange="updateStars(this.value)">
+                                <i data-lucide="star" class="star-icon" id="star-4" style="color: #cbd5e1; fill: none; transition: 0.2s;"></i>
+                            </label>
+                            <label style="cursor: pointer;">
+                                <input type="radio" name="feedback_rating" value="5" style="display: none;" required onchange="updateStars(this.value)">
+                                <i data-lucide="star" class="star-icon" id="star-5" style="color: #cbd5e1; fill: none; transition: 0.2s;"></i>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Written Feedback (Optional)</label>
+                        <textarea id="feedback-text-content" class="form-control" rows="3" placeholder="Share your experience with this repair..." style="width: 100%;"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-premium btn-full" style="margin-top: 2rem; height: 50px; border:none;">Submit Review</button>
+                    <button type="button" onclick="closeFeedbackModal()"
+                        style="background: none; border: none; color: var(--text-muted); cursor: pointer; width: 100%; text-align: center; margin-top: 1rem; font-weight: 600; font-size: 0.9rem;">
+                        Skip for now
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ── MODAL: DOCUMENT VIEWER (PRINTABLE SHEET) ── -->
+        <div id="doc-modal-overlay" class="modal-backdrop" onclick="document.getElementById('doc-modal-overlay').style.display='none'">
+            <div class="modal" style="max-width: 700px; background: #fff;" onclick="event.stopPropagation()">
+                <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+                    <button onclick="window.print()" class="btn-premium" style="font-size: 0.8rem; padding: 0.5rem 1rem;">Print Document</button>
+                    <button onclick="document.getElementById('doc-modal-overlay').style.display='none'" style="margin-left: 1rem; background: none; border: none; color: #666; cursor: pointer; font-weight: bold;">X</button>
+                </div>
+                <div id="doc-modal-content"></div>
+            </div>
+        </div>
+    </main>
+
+    <script src="static/js/db.js"></script>
+    <script>
+        lucide.createIcons();
+
+        // ── Authentication Check ──
+        const activeUser = db.getCurrentUser();
+        if (!activeUser || activeUser.role !== 'customer') {
+            window.location.href = 'login.html';
+        }
+
+        document.getElementById('welcome-name').innerText = activeUser.name;
+
+        // ── Navigation & Section Switching ──
+        function showSection(id) {
+            document.querySelectorAll('.section-content').forEach(s => s.style.display = 'none');
+            const target = document.getElementById(id + '-section');
+            if (target) {
+                target.style.display = 'block';
+            }
+
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            const activeTab = document.getElementById('tab-' + id);
+            if (activeTab) {
+                activeTab.classList.add('active');
+            }
+        }
+
+        // ── Loading Data dynamically from db.js ──
+        function loadDashboardData() {
+            const vehicles = db.getVehicles().filter(v => v.owner_id === activeUser.id);
+            const allServices = db.getServices();
+            const allUsers = db.getUsers();
+
+            const vehicleIds = vehicles.map(v => v.id);
+            // Get all services belonging to these vehicles
+            const myServices = allServices.filter(s => vehicleIds.includes(s.vehicle_id));
+
+            // Populate Stats
+            document.getElementById('stat-vehicles').innerText = vehicles.length;
+            document.getElementById('stat-completed').innerText = myServices.filter(s => s.status === 'Completed').length;
+            document.getElementById('stat-in-progress').innerText = myServices.filter(s => !['Completed', 'Cancelled'].includes(s.status)).length;
+
+            // Populate Reminders if health score is low or time elapsed
+            const remindersContainer = document.getElementById('reminders-container');
+            remindersContainer.innerHTML = '';
+            
+            vehicles.forEach(v => {
+                const health = db.calculateVehicleHealthScore(v.id);
+                if (health.score < 75) {
+                    const critical = health.score < 50;
+                    remindersContainer.innerHTML += `
+                    <div class="card glass animate reminder-glow ${critical ? 'overdue' : ''}" style="display:flex; align-items:center; gap:1.5rem; padding: 1.5rem 2rem; margin-bottom: 1rem;">
+                        <div style="background: ${critical ? 'rgba(239,68,68,0.1)' : 'rgba(245,158,11,0.1)'}; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items:center; justify-content:center; color:${critical ? 'var(--danger)' : 'var(--warning)'};">
+                            <i data-lucide="bell"></i>
+                        </div>
+                        <div style="flex:1">
+                            <h4 style="margin: 0; font-size: 1.1rem;">Health Warning for <span style="color:var(--primary-light)">${v.reg_no}</span></h4>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">
+                                AI Score: <strong style="color: ${critical ? 'var(--danger)' : 'var(--warning)'}">${health.score}/100 (${health.status})</strong>. Maintenance recommended.
+                            </p>
+                        </div>
+                        <button class="btn-premium" onclick="showSection('booking')" style="padding: 0.75rem 1.5rem; font-size: 0.85rem; background: ${critical ? 'var(--danger)' : 'var(--grad-primary)'}; border:none;">Book Care</button>
+                    </div>`;
+                }
+            });
+            lucide.createIcons();
+
+            // Populate Garage Cards
+            const garageContainer = document.getElementById('garage-container');
+            if (vehicles.length === 0) {
+                garageContainer.innerHTML = `<div class="glass" style="grid-column: 1/-1; padding: 3rem; text-align:center; color: var(--text-muted);">No vehicles registered in your garage.</div>`;
+            } else {
+                let html = '';
+                vehicles.forEach(v => {
+                    html += `
+                    <div class="card glass float" style="padding: 1rem; border: 1px solid var(--border);">
+                        ${v.image_url ? 
+                            `<img src="${v.image_url}" alt="${v.brand}" class="vehicle-image-card" style="height: 150px; margin-bottom: 1rem;">` :
+                            `<div style="width: 100%; height: 150px; background: var(--bg-body); border-radius: 16px; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center; border: 1px dashed var(--border);">
+                                <i data-lucide="car" style="width: 40px; height: 40px; opacity: 0.2;"></i>
+                             </div>`
+                        }
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h4 style="margin: 0; font-size: 1.1rem;">${v.brand} ${v.model}</h4>
+                                <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">${v.reg_no}</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--accent); font-size: 0.7rem; padding: 0.25rem 0.6rem; border-radius: 99px;">Active</span>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+                garageContainer.innerHTML = html;
+                lucide.createIcons();
+            }
+
+            // Populate Activity Table (Overview)
+            const overviewTableBody = document.getElementById('overview-table-body');
+            const historyTableBody = document.getElementById('history-table-body');
+            
+            const renderRow = (item) => {
+                const vehicle = vehicles.find(v => v.id === item.vehicle_id);
+                const tech = allUsers.find(u => u.id === item.technician_id);
+                const techName = tech ? tech.name : 'Auto-assigning...';
+
+                // Status Badge Color Class
+                let badgeClass = 'badge-general';
+                const statusLower = item.status.toLowerCase();
+                if (statusLower.includes('complete')) badgeClass = 'badge-completed';
+                else if (statusLower.includes('repair') || statusLower.includes('diagnos')) badgeClass = 'badge-repair';
+                else if (statusLower.includes('pending')) badgeClass = 'badge-pending';
+                else if (statusLower.includes('wash')) badgeClass = 'badge-wash';
+
+                const datasetString = `
+                    data-id="${item.id}"
+                    data-problem="${item.problem || ''}"
+                    data-work="${item.parts_details || ''}"
+                    data-parts="${item.parts_cost || 0}"
+                    data-labor="${item.labor_cost || 0}"
+                    data-status="${item.payment_status || 'Unpaid'}"
+                    data-tech="${techName}"
+                    data-isinsurance="${item.is_insurance_claim ? 'true' : 'false'}"
+                    data-claimstatus="${item.claim_status || ''}"
+                    data-wash="${item.wash_cost || 0}"
+                `;
+
+                return `
+                <tr>
+                    <td style="font-weight: 600;">${item.date}</td>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:0.75rem;">
+                            ${vehicle && vehicle.image_url ? `<img src="${vehicle.image_url}" alt="${vehicle.brand}" style="width:40px; height:30px; object-fit:cover; border-radius:4px; border:1px solid var(--border);">` : ''}
+                            <div>
+                                <div style="font-weight: 700;">${vehicle ? vehicle.brand + ' ' + vehicle.model : 'Car'}</div>
+                                <div style="font-size: 0.75rem; color:var(--text-muted);">${vehicle ? vehicle.reg_no : ''}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${item.problem.length > 40 ? item.problem.substring(0, 40) + '...' : item.problem}</td>
+                    <td>
+                        ${item.is_insurance_claim ? 
+                            `<span class="badge" style="background:rgba(99,102,241,0.1); color:var(--primary); padding:0.25rem 0.5rem; border-radius:8px;">${item.claim_status || 'Pending'}</span>` : 
+                            `<span style="color:var(--text-muted); font-size:0.8rem;">Self Paid</span>`
+                        }
+                    </td>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:0.5rem; color:var(--primary); font-weight:600;">
+                            <i data-lucide="wrench" style="width:14px; height:14px;"></i>
+                            ${techName}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge ${badgeClass}" style="padding:0.25rem 0.6rem; border-radius:99px; font-size:0.75rem;">${item.status}</span>
+                    </td>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:nowrap;">
+                            <button class="glass" style="padding: 0.5rem 1rem; font-size: 0.75rem; border-radius: 12px; font-weight: 700; color: var(--primary); white-space:nowrap; cursor:pointer;" ${datasetString} onclick="handleBillClick(this)">
+                                ${item.payment_status === 'Paid' ? 'Invoice' : 'Pay Now'}
+                            </button>
+                            <button class="glass" style="padding: 0.5rem 1rem; font-size: 0.75rem; border-radius: 12px; font-weight: 700; color: var(--accent); white-space:nowrap; cursor:pointer;" onclick="generateJobSheetHTML(${item.id})">
+                                Job Sheet
+                            </button>
+                            <button class="glass" style="padding: 0.5rem 1rem; font-size: 0.75rem; border-radius: 12px; font-weight: 700; color: var(--primary); white-space:nowrap; border-color: var(--primary); cursor:pointer;" onclick="generateInvoiceHTML(${item.id})">
+                                Invoice Bill
+                            </button>
+                            ${(item.status === 'Completed' && !item.rating) ? 
+                                `<button class="btn-premium" style="padding: 0.5rem 1rem; font-size: 0.75rem; background: var(--accent); border-radius: 12px; border:none; cursor:pointer;" data-id="${item.id}" data-tech="${techName}" onclick="openFeedbackModal(this)">Rate Tech</button>` : ''
+                            }
+                        </div>
+                    </td>
+                </tr>`;
+            };
+
+            let tableHtml = '';
+            // Display first 5 in overview
+            myServices.slice(0, 5).forEach(item => {
+                tableHtml += renderRow(item);
+            });
+            overviewTableBody.innerHTML = tableHtml || `<tr><td colspan="7" style="text-align:center; color: var(--text-muted);">No services recorded yet.</td></tr>`;
+
+            let allHistoryHtml = '';
+            myServices.forEach(item => {
+                allHistoryHtml += renderRow(item);
+            });
+            historyTableBody.innerHTML = allHistoryHtml || `<tr><td colspan="7" style="text-align:center; color: var(--text-muted);">No services recorded yet.</td></tr>`;
+            lucide.createIcons();
+
+            // Populate Booking Section forms
+            const bookingContainer = document.getElementById('booking-garage-container');
+            let bookingHtml = '';
+            vehicles.forEach(v => {
+                bookingHtml += `
+                <div class="card glass animate float" style="border-top: 4px solid var(--primary); padding: 2rem;">
+                    ${v.image_url ? `<img src="${v.image_url}" alt="${v.brand}" class="vehicle-image-card">` : ''}
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div>
+                            <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">${v.brand} ${v.model}</h3>
+                            <code style="background: rgba(99, 102, 241, 0.1); color: var(--primary-light); padding: 0.2rem 0.6rem; border-radius: 6px; font-weight: 700;">${v.reg_no}</code>
+                        </div>
+                        <i data-lucide="car" style="width: 32px; height: 32px; opacity: 0.2;"></i>
+                    </div>
+
+                    <form onsubmit="handleBookService(event, ${v.id})" style="margin-top: 2.5rem;">
+                        <div class="form-group">
+                            <label>Care Scope</label>
+                            <select id="type-${v.id}" class="form-control" required style="width:100%; height:50px;">
+                                <option value="General">General Service</option>
+                                <option value="Engine">Engine Repair</option>
+                                <option value="Electrical">Electrical System</option>
+                                <option value="Transmission">Transmission</option>
+                                <option value="Brakes">Brakes</option>
+                                <option value="AC/Cooling">AC/Cooling System</option>
+                                <option value="Body Work">Body Work</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Primary Concern / Problem Description</label>
+                            <textarea id="prob-${v.id}" class="form-control" rows="3" placeholder="Describe the issues or services required..." oninput="analyzeComplaint(this, 'analyzer-${v.id}')" required style="width:100%;"></textarea>
+                            <div id="analyzer-${v.id}" style="display:none"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Preferred Date</label>
+                            <input type="date" id="date-${v.id}" class="form-control" required style="height:50px;">
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem; background: rgba(99, 102, 241, 0.05); padding: 1rem; border-radius: 12px; border: 1px dashed var(--primary);">
+                            <input type="checkbox" id="ins-${v.id}" style="width: 20px; height: 20px;">
+                            <label for="ins-${v.id}" style="margin: 0; cursor: pointer;">
+                                <strong style="color: var(--primary-light);">Apply for Insurance Claim</strong>
+                                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">Cashless claim facility for covered damages</p>
+                            </label>
+                        </div>
+                        <button type="submit" class="btn-premium btn-full" style="height:50px; border:none;">Submit Booking Request</button>
+                    </form>
+                </div>`;
+            });
+            bookingContainer.innerHTML = bookingHtml || `<div class="glass" style="grid-column: 1/-1; padding: 3rem; text-align:center; color: var(--text-muted);">Please add a vehicle to book services.</div>`;
+            lucide.createIcons();
+
+            // Populate Health Section Cards
+            const healthContainer = document.getElementById('health-container');
+            let healthHtml = '';
+            vehicles.forEach(v => {
+                const health = db.calculateVehicleHealthScore(v.id);
+                
+                // Set health color
+                let color = '#ef4444';
+                if (health.score >= 85) color = '#10b981';
+                else if (health.score >= 70) color = '#3b82f6';
+                else if (health.score >= 50) color = '#f59e0b';
+
+                healthHtml += `
+                <div class="card glass animate float" style="border-top: 4px solid var(--primary); padding: 2rem;">
+                    ${v.image_url ? `<img src="${v.image_url}" alt="${v.brand}" class="vehicle-image-card">` : ''}
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 2rem;">
+                        <div>
+                            <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">${v.brand} ${v.model}</h3>
+                            <code style="background: rgba(99, 102, 241, 0.1); color: var(--primary-light); padding: 0.2rem 0.6rem; border-radius: 6px; font-weight: 700;">${v.reg_no}</code>
+                        </div>
+                        <i data-lucide="activity" style="width: 32px; height: 32px; opacity: 0.2;"></i>
+                    </div>
+
+                    <div style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); padding: 2rem; border-radius: 16px; margin-bottom: 1.5rem; text-align: center;">
+                        <div style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Health Score</div>
+                        <div style="font-size: 3rem; font-weight: 800; color: ${color};">${health.score}/100</div>
+                        <div style="font-size: 1rem; color: var(--text-muted); margin-top: 0.5rem;">
+                            <span style="padding: 4px 12px; border-radius: 8px; background: ${color}20; color: ${color}; font-weight: 700;">${health.status}</span>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                        <div style="background: var(--bg-body); padding: 1rem; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Mileage</div>
+                            <div style="font-size: 1.25rem; font-weight: 700;">${(v.current_mileage || 0).toLocaleString()} km</div>
+                        </div>
+                        <div style="background: var(--bg-body); padding: 1rem; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Services Count</div>
+                            <div style="font-size: 1.25rem; font-weight: 700;">${myServices.length}</div>
+                        </div>
+                    </div>
+
+                    <a href="vehicle_health.html?id=${v.id}" class="btn-premium btn-full" style="text-decoration: none; display: block; text-align: center;">
+                        View Detailed Analytics →
+                    </a>
+                </div>`;
+            });
+            healthContainer.innerHTML = healthHtml || `<div class="glass" style="grid-column: 1/-1; padding: 3rem; text-align:center; color: var(--text-muted);">Please add a vehicle to view health analysis.</div>`;
+            lucide.createIcons();
+
+            // Populate Insurance Section forms
+            const insuranceContainer = document.getElementById('insurance-container');
+            let insuranceHtml = '';
+            vehicles.forEach(v => {
+                insuranceHtml += `
+                <div class="card glass animate">
+                    ${v.image_url ? `<img src="${v.image_url}" alt="${v.brand}" class="vehicle-image-card" style="height: 120px;">` : ''}
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 2rem;">
+                        <div>
+                            <h3 style="margin:0">${v.brand} ${v.model}</h3>
+                            <code style="color:var(--primary-light)">${v.reg_no}</code>
+                        </div>
+                        <div style="background:var(--primary); padding:0.5rem; border-radius:12px; color:white; display:flex;">
+                            <i data-lucide="shield"></i>
+                        </div>
+                    </div>
+
+                    <form onsubmit="handleUpdateInsurance(event, ${v.id})">
+                        <div class="form-group">
+                            <label>Insurance Provider</label>
+                            <input type="text" id="ins-provider-${v.id}" class="form-control" value="${v.insurance_company || ''}" placeholder="e.g. Star Health, ICICI Lombard" style="height:50px; background:var(--bg-body);">
+                        </div>
+                        <div class="grid" style="grid-template-columns: 1fr 1fr; gap:1rem; margin-top:1rem;">
+                            <div class="form-group">
+                                <label>Policy Number</label>
+                                <input type="text" id="ins-policy-${v.id}" class="form-control" value="${v.policy_no || ''}" placeholder="POL123456" style="height:50px; background:var(--bg-body);">
+                            </div>
+                            <div class="form-group">
+                                <label>Expiry Date</label>
+                                <input type="date" id="ins-expiry-${v.id}" class="form-control" value="${v.policy_expiry || ''}" style="height:50px; background:var(--bg-body);">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-premium btn-full" style="margin-top:1.5rem; height:48px; border:none;">Update Policy Details</button>
+                    </form>
+
+                    ${v.policy_expiry ? `
+                    <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(16, 185, 129, 0.05); border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.2);">
+                        <div style="display:flex; align-items:center; gap:0.5rem;">
+                            <i data-lucide="check-circle" style="color:var(--accent); width:16px;"></i>
+                            <span style="font-size:0.85rem; font-weight:600;">Policy Logged</span>
+                        </div>
+                    </div>` : ''}
+                </div>`;
+            });
+            insuranceContainer.innerHTML = insuranceHtml || `<div class="glass" style="grid-column: 1/-1; padding: 3rem; text-align:center; color: var(--text-muted);">Please add a vehicle to manage insurance.</div>`;
+            lucide.createIcons();
+        }
+
+        // ── Booking Action Handler ──
+        function handleBookService(event, vehicleId) {
+            event.preventDefault();
+            const serviceType = document.getElementById('type-' + vehicleId).value;
+            const problem = document.getElementById('prob-' + vehicleId).value;
+            const date = document.getElementById('date-' + vehicleId).value;
+            const isInsurance = document.getElementById('ins-' + vehicleId).checked;
+
+            const assignedTechId = db.autoAssignTechnician(serviceType);
+
+            const services = db.getServices();
+            const newServiceId = services.length > 0 ? Math.max(...services.map(s => s.id)) + 1 : 1;
+
+            const newService = {
+                id: newServiceId,
+                vehicle_id: vehicleId,
+                technician_id: assignedTechId,
+                date: date,
+                problem: problem,
+                request: problem,
+                status: 'Under Diagnostics',
+                service_type: serviceType,
+                parts_details: '',
+                parts_cost: 0.0,
+                labor_cost: 0.0,
+                wash_cost: 0.0,
+                tech_commission: 0.0,
+                center_share: 0.0,
+                payment_status: 'Unpaid',
+                payment_method: null,
+                rating: null,
+                feedback: null,
+                is_insurance_claim: isInsurance,
+                claim_status: isInsurance ? 'Pending' : null
+            };
+
+            services.push(newService);
+            db.saveServices(services);
+
+            alert("Service booked successfully! Assigned to our technician.");
+            loadDashboardData();
+            showSection('overview');
+        }
+
+        // ── Insurance update handler ──
+        function handleUpdateInsurance(event, vehicleId) {
+            event.preventDefault();
+            const provider = document.getElementById('ins-provider-' + vehicleId).value;
+            const policy = document.getElementById('ins-policy-' + vehicleId).value;
+            const expiry = document.getElementById('ins-expiry-' + vehicleId).value;
+
+            const vehicles = db.getVehicles();
+            const vehicle = vehicles.find(v => v.id === vehicleId);
+            if (vehicle) {
+                vehicle.insurance_company = provider;
+                vehicle.policy_no = policy;
+                vehicle.policy_expiry = expiry;
+                db.saveVehicles(vehicles);
+                alert("Insurance details updated successfully!");
+                loadDashboardData();
+            }
+        }
+
+        // ── Emergency Request Handler ──
+        function handleEmergencySubmit(event) {
+            event.preventDefault();
+            const location = document.getElementById('emergency-location').value;
+            const problem = document.getElementById('emergency-problem').value;
+
+            const requests = db.getEmergencyRequests();
+            const newId = requests.length > 0 ? Math.max(...requests.map(r => r.id)) + 1 : 1;
+
+            const newReq = {
+                id: newId,
+                user_id: activeUser.id,
+                location: location,
+                problem: problem,
+                status: 'Pending',
+                timestamp: new Date().toISOString()
+            };
+
+            requests.push(newReq);
+            db.saveEmergencyRequests(requests);
+
+            document.getElementById('emergency-status-box').style.display = 'block';
+            document.getElementById('emergency-status-box').style.animation = 'fadeIn 0.3s ease';
+            
+            // clear form
+            document.getElementById('emergency-location').value = '';
+            document.getElementById('emergency-problem').value = '';
+            document.getElementById('analyzer-emergency').style.display = 'none';
+        }
+
+        // ── Feedback Modal Submission ──
+        function handleFeedbackSubmit(event) {
+            event.preventDefault();
+            const rating = parseInt(document.querySelector('input[name="feedback_rating"]:checked').value);
+            const feedbackText = document.getElementById('feedback-text-content').value;
+            const serviceId = parseInt(document.getElementById('feedback-service-id').value);
+
+            const services = db.getServices();
+            const service = services.find(s => s.id === serviceId);
+            if (service) {
+                service.rating = rating;
+                service.feedback = feedbackText;
+                db.saveServices(services);
+                alert("Thank you for your feedback!");
+                closeFeedbackModal();
+                loadDashboardData();
+            }
+        }
+
+        // ── Bill / Statement Modal logic ──
+        function handleBillClick(btn) {
+            const d = btn.dataset;
+            document.getElementById('bill-service-id').innerText = "#SRV-" + d.id;
+
+            const parts = parseFloat(d.parts);
+            const labor = parseFloat(d.labor);
+            const wash = parseFloat(d.wash || 0);
+            const total = parts + labor + wash;
+
+            document.getElementById('bill-parts').innerText = "₹" + parts.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+            document.getElementById('bill-labor').innerText = "₹" + labor.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+
+            const washRow = document.getElementById('wash-row');
+            if (wash > 0) {
+                document.getElementById('bill-wash').innerText = "₹" + wash.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+                washRow.style.display = 'flex';
+            } else {
+                washRow.style.display = 'none';
+            }
+
+            const billTotal = document.getElementById('bill-total');
+            const options = document.getElementById('payment-options');
+
+            if (d.isinsurance === 'true') {
+                const insCovered = total * 0.85; // 85% cashless estimate
+                const finalPayable = total - insCovered;
+
+                billTotal.innerHTML = `
+                    <div style="text-align:right;">
+                        <div style="font-size:0.9rem; color:var(--text-muted); font-weight:400;">Total Estimate: ₹${total.toLocaleString('en-IN')}</div>
+                        <div style="font-size:0.9rem; color:var(--primary-light); font-weight:600;">Insurance Covered (85%): -₹${insCovered.toLocaleString('en-IN')}</div>
+                        <div style="margin-top:0.5rem; color:var(--accent); font-weight:900;">Deductible: ₹${finalPayable.toLocaleString('en-IN')}</div>
+                    </div>
+                `;
+            } else {
+                billTotal.innerText = "₹" + total.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+            }
+
+            if (d.status === 'Paid') {
+                options.innerHTML = '<div style="background:rgba(16,185,129,0.1); color:var(--accent); padding:1rem; border-radius:15px; text-align:center; font-weight:700;">Invoice Paid ✅</div>';
+            } else if (total <= 0) {
+                options.innerHTML = '<div style="background:rgba(239,68,68,0.05); color:var(--danger); padding:1rem; border-radius:15px; text-align:center; font-size:0.85rem; font-weight:600;">Bill not yet generated by technician. Please wait...</div>';
+            } else {
+                options.innerHTML = `
+                    <button onclick="payBillOnline(${d.id}, ${total})" class="btn-premium btn-full" style="margin-bottom:1rem; border:none; height:45px; cursor:pointer;">Proceed to Secure Payment</button>
+                    <button onclick="payBillOffline(${d.id})" class="btn-full" style="background:transparent; border:1px solid var(--border); color:var(--text-muted); font-size:0.85rem; height:45px; cursor:pointer;">Request Cash Collection</button>
+                `;
+            }
+
+            document.getElementById('bill-modal-overlay').style.display = 'flex';
+        }
+
+        function closeBillModal(e) {
+            if (!e || e.target.id === 'bill-modal-overlay') {
+                document.getElementById('bill-modal-overlay').style.display = 'none';
+            }
+        }
+
+        function payBillOnline(serviceId, total) {
+            window.location.href = `payment_gateway.html?service_id=${serviceId}&amount=${total}`;
+        }
+
+        function payBillOffline(serviceId) {
+            const services = db.getServices();
+            const service = services.find(s => s.id === serviceId);
+            if (service) {
+                service.payment_method = 'Cash Collection Requested';
+                service.payment_status = 'Pending Cash Collection';
+                db.saveServices(services);
+                alert("Cash collection request submitted! A collector will call you.");
+                document.getElementById('bill-modal-overlay').style.display = 'none';
+                loadDashboardData();
+            }
+        }
+
+        function openFeedbackModal(btn) {
+            const d = btn.dataset;
+            document.getElementById('feedback-service-id').value = d.id;
+            document.getElementById('feedback-tech-name').innerText = "Technician: " + d.tech;
+            document.getElementById('feedback-modal-overlay').style.display = 'flex';
+            updateStars(0);
+        }
+
+        function closeFeedbackModal() {
+            document.getElementById('feedback-modal-overlay').style.display = 'none';
+        }
+
+        function updateStars(rating) {
+            for (let i = 1; i <= 5; i++) {
+                const star = document.getElementById('star-' + i);
+                if (i <= rating) {
+                    star.style.color = '#f59e0b';
+                    star.style.fill = '#f59e0b';
+                } else {
+                    star.style.color = '#cbd5e1';
+                    star.style.fill = 'none';
+                }
+            }
+        }
+
+        // ── AI Diagnostics Complaint Helper ──
+        const complaintMap = [
+            { keywords: ['brake', 'braking', 'noise', 'squeal', 'grinding'], suggestion: 'Possible brake pads worn out', recommendation: 'Recommended: Full brake system inspection' },
+            { keywords: ['overheating', 'temperature', 'hot', 'coolant', 'smoke'], suggestion: 'Cooling system failure or leak', recommendation: 'Recommended: Radiator and coolant level check' },
+            { keywords: ['start', 'battery', 'dead', 'click'], suggestion: 'Battery or charging system issue', recommendation: 'Recommended: Battery health & alternator test' },
+            { keywords: ['oil', 'leak', 'fluid'], suggestion: 'Fluid leak detected', recommendation: 'Recommended: Gasket & seal inspection' },
+            { keywords: ['shak', 'vibrat', 'steering'], suggestion: 'Suspension or alignment issue', recommendation: 'Recommended: Wheel alignment & suspension scan' },
+            { keywords: ['ac', 'cool', 'conditioning', 'hot air'], suggestion: 'AC compressor or gas issue', recommendation: 'Recommended: AC performance service' },
+            { keywords: ['engine', 'light', 'stalling', 'miss'], suggestion: 'Engine management issue', recommendation: 'Recommended: Full OBD-II diagnostic scan' }
+        ];
+
+        function analyzeComplaint(input, analyzerId) {
+            const text = input.value.toLowerCase();
+            const analyzer = document.getElementById(analyzerId);
+
+            if (text.length < 5) {
+                analyzer.style.display = 'none';
+                return;
+            }
+
+            let match = null;
+            for (const item of complaintMap) {
+                if (item.keywords.some(k => text.includes(k))) {
+                    match = item;
+                    break;
+                }
+            }
+
+            if (match) {
+                analyzer.innerHTML = `
+                    <div style="background: rgba(99, 102, 241, 0.05); border: 1px solid var(--primary); padding: 1rem; border-radius: 12px; margin-top: 0.5rem; animation: fadeIn 0.3s ease;">
+                        <div style="display:flex; align-items:center; gap:0.5rem; color:var(--primary-light); font-weight:700; font-size:0.8rem; margin-bottom:0.4rem;">
+                            <i data-lucide="bot" style="width:16px; height:16px;"></i> AI DIAGNOSTIC SUGGESTION
+                        </div>
+                        <div style="font-size:0.85rem; font-weight:600; color:var(--text-primary);">${match.suggestion}</div>
+                        <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.2rem;">${match.recommendation}</div>
+                    </div>
+                `;
+                analyzer.style.display = 'block';
+                lucide.createIcons();
+            } else {
+                analyzer.style.display = 'none';
+            }
+        }
+
+        // ── Printable Invoice & Job Sheet HTML Generation (Replaces Python ReportLab) ──
+        function generateJobSheetHTML(serviceId) {
+            const service = db.getServices().find(s => s.id === serviceId);
+            const vehicles = db.getVehicles();
+            const vehicle = service ? vehicles.find(v => v.id === service.vehicle_id) : null;
+            const tech = service ? db.getUsers().find(u => u.id === service.technician_id) : null;
+
+            if (!service) return;
+
+            const content = `
+            <div class="printable-content">
+                <div style="text-align: center; border-bottom: 2px double #000; padding-bottom: 1rem; margin-bottom: 1.5rem;">
+                    <h2>NEXTGEN AUTOCARE</h2>
+                    <p style="font-size: 0.8rem; color:#555;">Silicon Valley Phase 2, Bangalore | Ph: +91 800-NEXTGEN</p>
+                    <h3 style="margin-top: 1rem; letter-spacing: 2px;">WORKSHOP JOB CARD</h3>
+                </div>
+                <table style="width:100%; border-collapse: collapse; font-size: 0.9rem; margin-bottom: 1.5rem;">
+                    <tr>
+                        <td style="padding: 4px; font-weight:bold;">Job Card ID:</td><td>#JOB-${service.id}</td>
+                        <td style="padding: 4px; font-weight:bold;">Date:</td><td>${service.date}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px; font-weight:bold;">Reg No:</td><td style="color:#e11d48; font-weight:bold;">${vehicle ? vehicle.reg_no : 'N/A'}</td>
+                        <td style="padding: 4px; font-weight:bold;">Vehicle:</td><td>${vehicle ? vehicle.brand + ' ' + vehicle.model : 'N/A'}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px; font-weight:bold;">Technician:</td><td>${tech ? tech.name : 'Unassigned'}</td>
+                        <td style="padding: 4px; font-weight:bold;">Service Scope:</td><td>${service.service_type}</td>
+                    </tr>
+                </table>
+                <div style="border: 1px solid #000; padding: 1rem; margin-bottom: 1.5rem;">
+                    <strong style="display:block; margin-bottom:0.5rem;">CUSTOMER COMPLAINT / DEMAND:</strong>
+                    <p style="margin:0; font-size:0.95rem; line-height:1.4;">${service.problem}</p>
+                </div>
+                <div style="border: 1px solid #000; padding: 1rem; min-height: 120px;">
+                    <strong style="display:block; margin-bottom:0.5rem;">WORK DONE / DIAGNOSTICS LOG:</strong>
+                    <p style="margin:0; font-size:0.95rem; line-height:1.4;">${service.parts_details || 'Inspection and routine diagnostics underway. No parts replacement logged yet.'}</p>
+                </div>
+                <div style="margin-top: 3rem; display: flex; justify-content: space-between; font-size:0.85rem;">
+                    <div>Customer Signature: __________________</div>
+                    <div>Floor Manager: __________________</div>
+                </div>
+            </div>`;
+
+            document.getElementById('doc-modal-content').innerHTML = content;
+            document.getElementById('doc-modal-overlay').style.display = 'flex';
+        }
+
+        function generateInvoiceHTML(serviceId) {
+            const service = db.getServices().find(s => s.id === serviceId);
+            const vehicles = db.getVehicles();
+            const vehicle = service ? vehicles.find(v => v.id === service.vehicle_id) : null;
+            const tech = service ? db.getUsers().find(u => u.id === service.technician_id) : null;
+
+            if (!service) return;
+
+            const total = service.parts_cost + service.labor_cost + service.wash_cost;
+
+            const content = `
+            <div class="printable-content">
+                <div style="text-align: center; border-bottom: 2px double #000; padding-bottom: 1rem; margin-bottom: 1.5rem;">
+                    <h2>NEXTGEN AUTOCARE</h2>
+                    <p style="font-size: 0.8rem; color:#555;">Silicon Valley Phase 2, Bangalore | Ph: +91 800-NEXTGEN</p>
+                    <h3 style="margin-top: 1rem; letter-spacing: 2px;">TAX INVOICE / BILL</h3>
+                </div>
+                <table style="width:100%; border-collapse: collapse; font-size: 0.9rem; margin-bottom: 1.5rem;">
+                    <tr>
+                        <td style="padding: 4px; font-weight:bold;">Invoice ID:</td><td>#INV-${service.id}</td>
+                        <td style="padding: 4px; font-weight:bold;">Date:</td><td>${service.date}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px; font-weight:bold;">Vehicle Model:</td><td>${vehicle ? vehicle.brand + ' ' + vehicle.model : 'N/A'}</td>
+                        <td style="padding: 4px; font-weight:bold;">Reg No:</td><td style="color:#e11d48; font-weight:bold;">${vehicle ? vehicle.reg_no : 'N/A'}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px; font-weight:bold;">Billing Status:</td><td style="font-weight:bold; color: #15803d;">${service.payment_status}</td>
+                        <td style="padding: 4px; font-weight:bold;">Payment Mode:</td><td>${service.payment_method || 'Unpaid'}</td>
+                    </tr>
+                </table>
+                
+                <table style="width:100%; border-collapse: collapse; border: 1px solid #000; font-size: 0.9rem; margin-bottom: 2rem;">
+                    <thead>
+                        <tr style="background:#f1f5f9; border-bottom: 1px solid #000;">
+                            <th style="padding: 8px; text-align: left; border-right: 1px solid #000;">Item Description</th>
+                            <th style="padding: 8px; text-align: right;">Amount (₹)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid #ddd;">
+                            <td style="padding: 8px; border-right: 1px solid #000;">Parts & Materials Used (${service.parts_details || 'None'})</td>
+                            <td style="padding: 8px; text-align: right;">₹${service.parts_cost.toFixed(2)}</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #ddd;">
+                            <td style="padding: 8px; border-right: 1px solid #000;">Service Labor & Technician Charges</td>
+                            <td style="padding: 8px; text-align: right;">₹${service.labor_cost.toFixed(2)}</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #000;">
+                            <td style="padding: 8px; border-right: 1px solid #000;">Premium Detailing / Washing Fees</td>
+                            <td style="padding: 8px; text-align: right;">₹${service.wash_cost.toFixed(2)}</td>
+                        </tr>
+                        <tr style="font-weight: bold; background: #f8fafc;">
+                            <td style="padding: 10px; border-right: 1px solid #000; text-align:right;">Grand Total:</td>
+                            <td style="padding: 10px; text-align: right; color:#e11d48; font-size:1.1rem;">₹${total.toFixed(2)}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div style="font-size: 0.8rem; line-height: 1.4; color:#555; text-align:center; border-top:1px dashed #ddd; padding-top: 1rem;">
+                    This is a computer-generated statement. No physical signature is required. <br>
+                    <strong>Thank you for choosing NextGen AutoCare!</strong>
+                </div>
+            </div>`;
+
+            document.getElementById('doc-modal-content').innerHTML = content;
+            document.getElementById('doc-modal-overlay').style.display = 'flex';
+        }
+
+        // Export Report Mock
+        function exportReport() {
+            alert("Digital Report exported successfully! Downloading PDF draft...");
+        }
+
+        // Initialize Page
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDashboardData();
+        });
+    </script>
+    <script src="static/js/theme.js"></script>
+</body>
+
+</html>

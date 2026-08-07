@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "server.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": [
+          "templates/**",
+          "static/**"
+        ]
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "server.js"
+    }
+  ]
+}

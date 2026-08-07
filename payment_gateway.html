@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Checkout | NextGen AutoCare</title>
+    <link rel="stylesheet" href="static/css/index.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at top right, #1e293b, #0f172a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem;
+            color: white;
+        }
+
+        .payment-container {
+            width: 100%;
+            max-width: 450px;
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 32px;
+            padding: 2.5rem;
+            backdrop-filter: blur(24px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .brand-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .service-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .amount-hero {
+            text-align: center;
+            padding: 1rem 0;
+        }
+
+        .amount-hero h1 {
+            font-size: 3.5rem;
+            margin: 0;
+            font-weight: 800;
+            background: linear-gradient(to bottom, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .payment-btn {
+            background: #6366f1;
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: white;
+            border: none;
+            padding: 1.25rem;
+            border-radius: 16px;
+            width: 100%;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
+            margin-top: 1rem;
+        }
+
+        .payment-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 30px -10px rgba(79, 70, 229, 0.6);
+            filter: brightness(1.1);
+        }
+
+        .trust-badges {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 2rem;
+            opacity: 0.6;
+        }
+
+        .badge-item {
+            font-size: 0.7rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .shimmer-text {
+            color: #94a3b8;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="payment-container">
+        <div class="brand-header">
+            <div
+                style="display: inline-flex; background: rgba(99, 102, 241, 0.1); padding: 8px 16px; border-radius: 100px; color: #818cf8; font-size: 0.75rem; font-weight: 700; margin-bottom: 1rem; border: 1px solid rgba(99, 102, 241, 0.2);">
+                <i data-lucide="shield-check" style="width: 14px; margin-right: 6px;"></i>
+                SECURE CHECKOUT
+            </div>
+            <h2 style="margin: 0; font-size: 1.5rem;">NextGen AutoCare</h2>
+        </div>
+
+        <div class="amount-hero">
+            <span class="shimmer-text">Total Payable</span>
+            <h1 id="payment-amount">₹0.00</h1>
+        </div>
+
+        <div class="service-card" id="details-card">
+            <!-- Dynamic Details -->
+        </div>
+
+        <div class="upi-section"
+            style="background: rgba(255, 255, 255, 0.05); border-radius: 24px; padding: 1.5rem; text-align: center; border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div
+                style="background: white; padding: 1.5rem; border-radius: 24px; display: inline-block; margin-bottom: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 2px solid var(--primary);">
+                <img id="qr-image" src="" alt="Scan to Pay"
+                    style="display: block; width: 220px; height: 220px; object-fit: contain; margin: 0 auto;">
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 0.5rem;">Scan QR code or use ID below</p>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <div
+                        style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between;">
+                        <span style="font-size: 0.8rem; color: #818cf8; font-family: monospace;">pay@nextgenautocare</span>
+                        <button onclick="copyToClipboard('pay@nextgenautocare')"
+                            style="background: none; border: none; color: #94a3b8; cursor: pointer; padding: 4px;">
+                            <i data-lucide="copy" style="width: 14px;"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <form onsubmit="confirmPayment(event)">
+                <input type="text" id="transaction-id" placeholder="Enter Transaction ID / UTR" required
+                    style="width: 100%; padding: 12px; border-radius: 12px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: white; margin-bottom: 12px; box-sizing: border-box; text-align: center; font-size: 1rem; outline: none;">
+                <button type="submit" class="payment-btn"
+                    style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4); padding: 1rem;">
+                    Confirm Payment
+                </button>
+            </form>
+        </div>
+
+        <p style="text-align: center; font-size: 0.75rem; color: #64748b; margin-top: 1.5rem; line-height: 1.6;">
+            By proceeding, you agree to our Terms & Conditions. <br>
+            Official Business Account: NEXTGEN AUTOCARE PVT LTD
+        </p>
+
+        <div class="trust-badges">
+            <div class="badge-item">
+                <i data-lucide="lock" style="width: 18px; color: #10b981;"></i>
+                <span>Secure</span>
+            </div>
+            <div class="badge-item">
+                <i data-lucide="smartphone" style="width: 18px; color: #3b82f6;"></i>
+                <span>UPI</span>
+            </div>
+            <div class="badge-item">
+                <i data-lucide="shield" style="width: 18px; color: #f59e0b;"></i>
+                <span>Verified</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="static/js/db.js"></script>
+    <script>
+        lucide.createIcons();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // Mode detection
+        const partId = parseInt(urlParams.get('part_id'));
+        const serviceId = parseInt(urlParams.get('service_id'));
+        const amount = parseFloat(urlParams.get('amount'));
+
+        const name = urlParams.get('name');
+        const phone = urlParams.get('phone');
+        const address = urlParams.get('address');
+        const qty = parseInt(urlParams.get('qty'));
+
+        document.getElementById('payment-amount').innerText = '₹' + amount.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+
+        // Build UPI link and QR code
+        const upiId = "pay@nextgenautocare";
+        const upiLink = `upi://pay?pa=${upiId}&pn=NextGen%20AutoCare&am=${amount}&cu=INR`;
+        document.getElementById('qr-image').src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiLink)}`;
+
+        // Populate card details
+        const detailsCard = document.getElementById('details-card');
+        if (partId) {
+            const part = db.getInventory().find(p => p.id === partId);
+            detailsCard.innerHTML = `
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <span style="color: #94a3b8; font-size: 0.9rem;">Product</span>
+                <span style="font-weight: 600;">${part ? part.name : 'Unknown Part'}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <span style="color: #94a3b8; font-size: 0.9rem;">Quantity</span>
+                <span style="font-weight: 600;">${qty}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span style="color: #94a3b8; font-size: 0.9rem;">Deliver to</span>
+                <span style="font-weight: 600; text-align: right; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${name}</span>
+            </div>`;
+        } else if (serviceId) {
+            const services = db.getServices();
+            const service = services.find(s => s.id === serviceId);
+            const vehicles = db.getVehicles();
+            const vehicle = service ? vehicles.find(v => v.id === service.vehicle_id) : null;
+
+            detailsCard.innerHTML = `
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <span style="color: #94a3b8; font-size: 0.9rem;">Invoice ID</span>
+                <span style="font-weight: 600;">#SRV-${serviceId}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <span style="color: #94a3b8; font-size: 0.9rem;">Vehicle</span>
+                <span style="font-weight: 600;">${vehicle ? vehicle.brand + ' ' + vehicle.model : 'Registered Car'}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span style="color: #94a3b8; font-size: 0.9rem;">Reg No.</span>
+                <span style="font-weight: 600; color: #818cf8; letter-spacing: 1px;">${vehicle ? vehicle.reg_no : ''}</span>
+            </div>`;
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('UPI ID copied: ' + text);
+            });
+        }
+
+        function confirmPayment(event) {
+            event.preventDefault();
+            const utr = document.getElementById('transaction-id').value;
+            if (!utr) return;
+
+            if (partId) {
+                // Place product purchase order
+                const orders = db.getOrders();
+                const newOrderId = orders.length > 0 ? Math.max(...orders.map(o => o.id)) + 1 : 1;
+                
+                const newOrder = {
+                    id: newOrderId,
+                    customer_name: name,
+                    phone: phone,
+                    location: address,
+                    part_id: partId,
+                    quantity: qty,
+                    total_amount: amount,
+                    payment_method: 'Card/UPI (Paid - UTR: ' + utr + ')',
+                    date: new Date().toISOString(),
+                    status: 'Pending'
+                };
+
+                orders.push(newOrder);
+                db.saveOrders(orders);
+
+                // Decrement stock
+                const inventory = db.getInventory();
+                const dbPart = inventory.find(p => p.id === partId);
+                if (dbPart) {
+                    dbPart.stock -= qty;
+                    db.saveInventory(inventory);
+                }
+
+                // Redirect to success
+                window.location.href = `order_success.html?id=${newOrderId}`;
+            } else if (serviceId) {
+                // Update service payment status
+                const services = db.getServices();
+                const service = services.find(s => s.id === serviceId);
+                if (service) {
+                    service.payment_status = 'Paid';
+                    service.payment_method = 'UPI/Card (UTR: ' + utr + ')';
+                    db.saveServices(services);
+                }
+                
+                alert("Payment Confirmed! Invoice marked as paid.");
+                window.location.href = 'customer_dashboard.html';
+            }
+        }
+    </script>
+</body>
+
+</html>
